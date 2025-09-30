@@ -70,34 +70,44 @@ def chat(user: str, prompt: str) -> str:
     except Exception as e:
         return f"调用出错: {e}"
 
-def listen_and_reply(friend_name):
-    last_handled = None  # 记录上一次处理过的消息
+def main_loop(friend_names):
+    """监听并回复来自多个好友的消息"""
+    last_handled = {}  # 使用字典为每个好友记录最后处理的消息
 
     while True:
-        wx.ChatWith(friend_name)
-        msgs = wx.GetAllMessage()
-        if msgs:
+        for friend_name in friend_names:
+            wx.ChatWith(friend_name)
+            msgs = wx.GetAllMessage()
+            if not msgs:
+                continue
+
             last_msg = msgs[-1]
-            
+
             # 忽略自己发送的消息，避免自我回复
-            if last_msg.sender == "self":  # 有的版本 sender 为 "self"
-                time.sleep(1)
+            if last_msg.sender == "self":
                 continue
 
             # 避免重复处理同一条消息
-            if last_msg == last_handled:
-                time.sleep(1)
+            if last_handled.get(friend_name) == last_msg:
                 continue
-            last_handled = last_msg
+            
+            last_handled[friend_name] = last_msg
 
-            print(f"收到：{last_msg.sender}: {last_msg.content}")
+            print(f"收到来自 {friend_name} 的消息: {last_msg.content}")
 
             # 调用 AI 回复
             reply = chat(friend_name, last_msg.content)
             wx.SendMsg(reply)
-            print(f"已回复：{reply}")
-
+            print(f"已向 {friend_name} 回复: {reply}")
+        
+        # 在检查完所有好友后等待一段时间
         time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
-    listen_and_reply(config.CONTACT_NAME)
+    # 从配置中获取要聊天的联系人列表
+    friend_list = config.CONTACT_NAMES
+    if not isinstance(friend_list, list):
+        print("错误: config.py 中的 CONTACT_NAMES 应该是一个列表。")
+    else:
+        print(f"开始监听 {len(friend_list)} 位好友的消息: {', '.join(friend_list)}")
+        main_loop(friend_list)
