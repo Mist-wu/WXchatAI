@@ -1,4 +1,9 @@
-# 忽略配置文件
+# Python 缓存
+__pycache__/
+
+# 忽略配置文件和数据库
 config.py
 history.db
-wxauto_log
+
+# 忽略日志目录
+wxauto_logs/
