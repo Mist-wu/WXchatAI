@@ -10,9 +10,9 @@ import time
 
 
 # ---------------- 配置 ----------------
-API_KEY = config.API_KEY
-API_URL = config.API_URL
-MODEL = config.MODEL
+API_KEY = config.GLM_API_KEY
+API_URL = config.GLM_API_URL
+MODEL = config.GLM_MODEL
 CHECK_INTERVAL = config.CHECK_INTERVAL
 # --------------------------------------
 
